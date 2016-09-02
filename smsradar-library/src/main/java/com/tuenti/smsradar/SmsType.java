@@ -15,6 +15,8 @@
  */
 package com.tuenti.smsradar;
 
+import android.util.Log;
+
 /**
  * Represents the SmsType.
  * <p/>
@@ -50,7 +52,9 @@ public enum SmsType {
 				return smsType;
 			}
 		}
-		throw new IllegalArgumentException("Invalid sms type: " + value);
+		//throw new IllegalArgumentException("Invalid sms type: " + value);
+		Log.e("SmsType", "Invalid sms type: " + value);
+		return UNKNOWN;
 	}
 
 }

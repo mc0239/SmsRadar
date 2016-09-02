@@ -21,6 +21,7 @@ import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
+import android.provider.Telephony;
 
 
 /**
@@ -42,8 +43,8 @@ import android.os.Handler;
 class SmsObserver extends ContentObserver {
 
 	private static final Uri SMS_URI = Uri.parse("content://sms/");
-	private static final Uri SMS_SENT_URI = Uri.parse("content://sms/sent");
-	private static final Uri SMS_INBOX_URI = Uri.parse("content://sms/inbox");
+	//private static final Uri SMS_SENT_URI = Uri.parse("content://sms/sent");
+	//private static final Uri SMS_INBOX_URI = Uri.parse("content://sms/inbox");
 	private static final String PROTOCOL_COLUM_NAME = "protocol";
 	private static final String SMS_ORDER = "date DESC";
 
@@ -102,7 +103,7 @@ class SmsObserver extends ContentObserver {
 	}
 
 	private Cursor getSmsDetailsCursor(String protocol) {
-		Cursor smsCursor;
+		/*Cursor smsCursor;
 		if (isProtocolForOutgoingSms(protocol)) {
 			//SMS Sent
 			smsCursor = getSmsDetailsCursor(SmsContext.SMS_SENT.getUri());
@@ -111,6 +112,8 @@ class SmsObserver extends ContentObserver {
 			smsCursor = getSmsDetailsCursor(SmsContext.SMS_RECEIVED.getUri());
 		}
 		return smsCursor;
+		*/
+		return getSmsDetailsCursor(SMS_URI);
 	}
 
 	private Cursor getSmsContentObserverCursor() {
@@ -143,6 +146,7 @@ class SmsObserver extends ContentObserver {
 	/**
 	 * Represents the SMS origin.
 	 */
+	/*
 	private enum SmsContext {
 		SMS_SENT {
 			@Override
@@ -158,4 +162,5 @@ class SmsObserver extends ContentObserver {
 
 		abstract Uri getUri();
 	}
+	*/
 }

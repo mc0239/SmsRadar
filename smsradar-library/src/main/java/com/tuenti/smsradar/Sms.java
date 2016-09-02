@@ -27,13 +27,15 @@ package com.tuenti.smsradar;
  */
 public class Sms {
 
+	private final int smsId;
 	private final String address;
 	private final String date;
 	private final String msg;
 	private final SmsType type;
 
 
-	public Sms(String address, String date, String msg, SmsType type) {
+	public Sms(int smsId, String address, String date, String msg, SmsType type) {
+		this.smsId = smsId;
 		this.address = address;
 		this.date = date;
 		this.msg = msg;
@@ -56,6 +58,10 @@ public class Sms {
 		return type;
 	}
 
+	public int getSmsId() {
+		return smsId;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -63,6 +69,7 @@ public class Sms {
 
 		Sms sms = (Sms) o;
 
+		if (smsId != sms.smsId) return false;
 		if (address != null ? !address.equals(sms.address) : sms.address != null) return false;
 		if (date != null ? !date.equals(sms.date) : sms.date != null) return false;
 		if (msg != null ? !msg.equals(sms.msg) : sms.msg != null) return false;
@@ -83,7 +90,8 @@ public class Sms {
 	@Override
 	public String toString() {
 		return "Sms{" +
-				"address='" + address + '\'' +
+				"smsId='" + smsId + '\'' +
+				", address='" + address + '\'' +
 				", date='" + date + '\'' +
 				", msg='" + msg + '\'' +
 				", type=" + type +

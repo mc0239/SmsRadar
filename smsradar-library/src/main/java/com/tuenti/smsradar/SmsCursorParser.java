@@ -66,7 +66,7 @@ class SmsCursorParser {
 		Date smsDate = new Date(Long.parseLong(date));
 
 		if (shouldParseSms(smsId, smsDate)) {
-			updateLastSmsParsed(smsId);
+			updateLastSmsParsed(smsId, String.valueOf(smsDate.getTime()));
 		} else {
 			smsParsed = null;
 		}
@@ -74,14 +74,14 @@ class SmsCursorParser {
 		return smsParsed;
 	}
 
-	private void updateLastSmsParsed(int smsId) {
-		smsStorage.updateLastSmsIntercepted(smsId);
+	private void updateLastSmsParsed(int smsId, String date) {
+		smsStorage.updateLastSmsIntercepted(smsId, date);
 	}
 
 	private boolean shouldParseSms(int smsId, Date smsDate) {
 		boolean isFirstSmsParsed = isFirstSmsParsed();
 		boolean isOld = isOld(smsDate);
-		boolean shouldParseId = shouldParseSmsId(smsId);
+		boolean shouldParseId = shouldParseSmsId(smsId, String.valueOf(smsDate.getTime()));
 		return (isFirstSmsParsed && !isOld) || (!isFirstSmsParsed && shouldParseId);
 	}
 
@@ -90,12 +90,15 @@ class SmsCursorParser {
 		return now.getTime() - smsDate.getTime() > SMS_MAX_AGE_MILLIS;
 	}
 
-	private boolean shouldParseSmsId(int smsId) {
+	private boolean shouldParseSmsId(int smsId, String date) {
 		if (smsStorage.isFirstSmsIntercepted()) {
 			return false;
 		}
-		int lastSmsIdIntercepted = smsStorage.getLastSmsIntercepted();
-		return smsId > lastSmsIdIntercepted;
+		Sms lastSmsIntercepted = smsStorage.getLastSmsIntercepted();
+
+		boolean isNewerThanPreviousSms = Long.parseLong(smsStorage.getLastSmsIntercepted().getDate()) <= Long.parseLong(date);
+
+		return (lastSmsIntercepted.getSmsId() != smsId || !date.equals(lastSmsIntercepted.getDate())) && isNewerThanPreviousSms;
 	}
 
 	private boolean isFirstSmsParsed() {
@@ -103,12 +106,13 @@ class SmsCursorParser {
 	}
 
 	private Sms extractSmsInfoFromCursor(Cursor cursor) {
+		int smsId = cursor.getInt(cursor.getColumnIndex(ID_COLUMN_NAME));
 		String address = cursor.getString(cursor.getColumnIndex(ADDRESS_COLUMN_NAME));
 		String date = cursor.getString(cursor.getColumnIndex(DATE_COLUMN_NAME));
 		String msg = cursor.getString(cursor.getColumnIndex(BODY_COLUMN_NAME));
 		String type = cursor.getString(cursor.getColumnIndex(TYPE_COLUMN_NAME));
 
-		return new Sms(address, date, msg, SmsType.fromValue(Integer.parseInt(type)));
+		return new Sms(smsId, address, date, msg, SmsType.fromValue(Integer.parseInt(type)));
 	}
 
 	private boolean canHandleCursor(Cursor cursor) {

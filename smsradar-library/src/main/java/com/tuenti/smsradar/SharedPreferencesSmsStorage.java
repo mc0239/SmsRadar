@@ -17,6 +17,7 @@ package com.tuenti.smsradar;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.Bundle;
 
 /**
  * SmsStorage implementation based on shared preferences.
@@ -26,7 +27,8 @@ import android.content.SharedPreferences.Editor;
  */
 class SharedPreferencesSmsStorage implements SmsStorage {
 
-	private static final String LAST_SMS_PARSED = "last_sms_parsed";
+	private static final String LAST_SMS_PARSED_ID = "last_sms_parsed_id";
+	private static final String LAST_SMS_PARSED_TIME = "last_sms_parsed_time";
 	private static final int DEFAULT_SMS_PARSED_VALUE = -1;
 
 	private SharedPreferences preferences;
@@ -39,19 +41,20 @@ class SharedPreferencesSmsStorage implements SmsStorage {
 	}
 
 	@Override
-	public void updateLastSmsIntercepted(int smsId) {
+	public void updateLastSmsIntercepted(int smsId, String date) {
 		Editor editor = preferences.edit();
-		editor.putInt(LAST_SMS_PARSED, smsId);
-		editor.commit();
+		editor.putInt(LAST_SMS_PARSED_ID, smsId);
+		editor.putString(LAST_SMS_PARSED_TIME, date);
+		editor.apply();
 	}
 
 	@Override
-	public int getLastSmsIntercepted() {
-		return preferences.getInt(LAST_SMS_PARSED, DEFAULT_SMS_PARSED_VALUE);
+	public Sms getLastSmsIntercepted() {
+		return new Sms(preferences.getInt(LAST_SMS_PARSED_ID, -1), null, preferences.getString(LAST_SMS_PARSED_TIME, null), null, null);
 	}
 
 	@Override
 	public boolean isFirstSmsIntercepted() {
-		return getLastSmsIntercepted() == DEFAULT_SMS_PARSED_VALUE;
+		return getLastSmsIntercepted().getSmsId() == DEFAULT_SMS_PARSED_VALUE;
 	}
 }

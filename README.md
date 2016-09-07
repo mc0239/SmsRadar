@@ -1,3 +1,8 @@
+Note
+========
+This reporsitory is a fork of [vaslabs/SmsRadar](https://github.com/vaslabs/SmsRadar) with some additions/fixes. This library was tested on Android version 5.1, 4.4 and 4.1.
+If SmsRadar service is not "catching" received/sent text messages at all, a possible fix is installing [Google's Messanger app (ApkMirror link)](http://www.apkmirror.com/apk/google-inc/messenger-google-inc/messenger-google-inc-1-9-035-release/).
+
 SMS Radar [![Build Status](https://travis-ci.org/tuenti/SmsRadar.svg?branch=master)](https://travis-ci.org/tuenti/SmsRadar) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.tuenti.smsradar/library/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.tuenti.smsradar/library) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-SmsRadar-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/1328)
 =========
 

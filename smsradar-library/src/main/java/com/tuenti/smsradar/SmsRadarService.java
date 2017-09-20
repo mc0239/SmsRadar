@@ -28,6 +28,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.provider.Telephony;
 
+import java.util.Date;
+
 
 /**
  * Service created to handle the SmsContentObserver registration. This service has the responsibility of register and
@@ -46,7 +48,6 @@ public class SmsRadarService extends Service {
 	private ContentResolver contentResolver;
 	private SmsObserver smsObserver;
 	private AlarmManager alarmManager;
-	private TimeProvider timeProvider;
 	private boolean initialized;
 
 
@@ -79,8 +80,7 @@ public class SmsRadarService extends Service {
         // restart service
         Intent intent = new Intent(this, SmsRadarService.class);
         PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, 0);
-        long now = getTimeProvider().getDate().getTime();
-        getAlarmManager().set(AlarmManager.RTC_WAKEUP, now + ONE_SECOND, pendingIntent);
+        getAlarmManager().set(AlarmManager.RTC_WAKEUP, new Date().getTime() + ONE_SECOND, pendingIntent);
 	}
 
 	private void initializeService() {
@@ -103,10 +103,6 @@ public class SmsRadarService extends Service {
         contentResolver.registerContentObserver(Telephony.Sms.CONTENT_URI, true, smsObserver);
 	}
 
-	private TimeProvider getTimeProvider() {
-		return timeProvider != null ? timeProvider : new TimeProvider();
-	}
-
 	private AlarmManager getAlarmManager() {
 		return alarmManager != null ? alarmManager : (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 	}
@@ -126,9 +122,5 @@ public class SmsRadarService extends Service {
 
 	void setAlarmManager(AlarmManager alarmManager) {
 		this.alarmManager = alarmManager;
-	}
-
-	void setTimeProvider(TimeProvider timeProvider) {
-		this.timeProvider = timeProvider;
 	}
 }

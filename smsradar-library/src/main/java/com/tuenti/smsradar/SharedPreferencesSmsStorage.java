@@ -53,9 +53,4 @@ class SharedPreferencesSmsStorage implements SmsStorage {
 	public Sms getLastSmsIntercepted() {
 		return new Sms(preferences.getInt(LAST_SMS_PARSED_ID, DEFAULT_SMS_PARSED_VALUE), null, preferences.getString(LAST_SMS_PARSED_TIME, null), null, null);
 	}
-
-	@Override
-	public boolean isFirstSmsIntercepted() {
-		return getLastSmsIntercepted().getSmsId() == DEFAULT_SMS_PARSED_VALUE;
-	}
 }

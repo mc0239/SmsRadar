@@ -22,11 +22,7 @@ package com.tuenti.smsradar;
  * @author Manuel Peinado <mpeinado@tuenti.com>
  */
 interface SmsStorage {
-
-
 	void updateLastSmsIntercepted(int smsId, String date);
 
 	Sms getLastSmsIntercepted();
-
-	boolean isFirstSmsIntercepted();
 }

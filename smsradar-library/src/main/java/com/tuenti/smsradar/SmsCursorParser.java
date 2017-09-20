@@ -50,7 +50,7 @@ class SmsCursorParser {
 
 		Sms smsParsed = extractSmsInfoFromCursor(cursor);
 
-        Sms received = new Sms(smsParsed.getSmsId(), null, smsParsed.getDate(), null, smsParsed.getType());
+        Sms received = new Sms(smsParsed.getSmsId(), null, smsParsed.getDate(), null, null);
         Sms stored = smsStorage.getLastSmsIntercepted();
 
         if(!received.equals(stored)) {

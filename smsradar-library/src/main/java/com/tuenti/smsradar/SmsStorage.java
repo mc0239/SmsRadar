@@ -25,4 +25,6 @@ interface SmsStorage {
 	void updateLastSmsIntercepted(int smsId, String date);
 
 	Sms getLastSmsIntercepted();
+
+	void clearLastSmsIntercepted();
 }

@@ -53,4 +53,12 @@ class SharedPreferencesSmsStorage implements SmsStorage {
 	public Sms getLastSmsIntercepted() {
 		return new Sms(preferences.getInt(LAST_SMS_PARSED_ID, DEFAULT_SMS_PARSED_VALUE), null, preferences.getString(LAST_SMS_PARSED_TIME, null), null, null);
 	}
+
+    @Override
+    public void clearLastSmsIntercepted() {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(LAST_SMS_PARSED_ID, DEFAULT_SMS_PARSED_VALUE);
+        editor.putString(LAST_SMS_PARSED_TIME, null);
+        editor.apply();
+    }
 }

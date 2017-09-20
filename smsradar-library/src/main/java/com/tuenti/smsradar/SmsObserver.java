@@ -76,11 +76,16 @@ class SmsObserver extends ContentObserver {
 	private void notifySmsListener(Sms sms) {
 		if (sms != null && SmsRadar.smsListener != null) {
             Log.v(this.getClass().getSimpleName(), "Notify about SMS: " + sms.toString());
-			if (SmsType.SENT == sms.getType()) {
-				SmsRadar.smsListener.onSmsSent(sms);
-			} else {
-				SmsRadar.smsListener.onSmsReceived(sms);
-			}
+            switch (sms.getType()) {
+                case SENT:
+                    SmsRadar.smsListener.onSmsSent(sms);
+                    break;
+                case RECEIVED:
+                    SmsRadar.smsListener.onSmsReceived(sms);
+                    break;
+                default:
+                    break;
+            }
 		}
 	}
 

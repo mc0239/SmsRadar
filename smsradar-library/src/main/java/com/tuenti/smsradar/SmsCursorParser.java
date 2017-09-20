@@ -53,7 +53,7 @@ class SmsCursorParser {
         Sms received = new Sms(smsParsed.getSmsId(), null, smsParsed.getDate(), null, null);
         Sms stored = smsStorage.getLastSmsIntercepted();
 
-        if(!received.equals(stored)) {
+        if(!received.equals(stored) && isActuallyNewSms(received, stored)) {
             smsStorage.updateLastSmsIntercepted(smsParsed.getSmsId(), smsParsed.getDate());
         } else {
             smsParsed = null;
@@ -61,6 +61,15 @@ class SmsCursorParser {
 
         return smsParsed;
 	}
+
+	private boolean isActuallyNewSms(Sms received, Sms stored) {
+        int oldId = stored.getSmsId();
+        int newId = received.getSmsId();
+        long oldDate = Long.parseLong(stored.getDate());
+        long newDate = Long.parseLong(received.getDate());
+
+        return newId > oldId || newDate > oldDate;
+    }
 
 	private Sms extractSmsInfoFromCursor(Cursor cursor) {
 		int smsId = cursor.getInt(cursor.getColumnIndex(Telephony.Sms._ID));

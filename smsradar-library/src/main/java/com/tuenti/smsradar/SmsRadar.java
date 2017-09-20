@@ -17,7 +17,6 @@ package com.tuenti.smsradar;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 
 /**
  * Main library class. This class has to be used to initialize or stop the sms interceptor service.
@@ -59,11 +58,8 @@ public class SmsRadar {
 	 * Clears preferences storing last saved SMS.
 	 * @param context used to access preferences
      */
-	public static void clearSmsStorage(Context context) {
-		SharedPreferences preferences = context.getSharedPreferences("sms_preferences", Context.MODE_PRIVATE);
-		SharedPreferences.Editor prefEditor = preferences.edit();
-		prefEditor.putInt("last_sms_parsed_id", -1);
-		prefEditor.putString("last_sms_parsed_time", null);
-		prefEditor.apply();
+	public static void clearSmsRadarStorage(Context context) {
+		SmsStorage storage = new SharedPreferencesSmsStorage(context);
+		storage.clearLastSmsIntercepted();
 	}
 }

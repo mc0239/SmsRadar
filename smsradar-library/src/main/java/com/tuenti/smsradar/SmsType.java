@@ -15,6 +15,7 @@
  */
 package com.tuenti.smsradar;
 
+import android.provider.Telephony;
 import android.util.Log;
 
 /**
@@ -30,13 +31,17 @@ import android.util.Log;
  */
 public enum SmsType {
 
-	UNKNOWN(-1),
-	RECEIVED(1),
-	SENT(2),;
+	UNKNOWN (-1),
+	RECEIVED (Telephony.Sms.MESSAGE_TYPE_INBOX),
+	DRAFT (Telephony.Sms.MESSAGE_TYPE_DRAFT),
+	FAILED (Telephony.Sms.MESSAGE_TYPE_FAILED),
+	OUTBOX (Telephony.Sms.MESSAGE_TYPE_OUTBOX),
+	QUEUED (Telephony.Sms.MESSAGE_TYPE_QUEUED),
+	SENT (Telephony.Sms.MESSAGE_TYPE_SENT);
 
 	private final int value;
 
-	private SmsType(int value) {
+	SmsType(int value) {
 		this.value = value;
 	}
 
@@ -53,7 +58,7 @@ public enum SmsType {
 			}
 		}
 		//throw new IllegalArgumentException("Invalid sms type: " + value);
-		Log.e("SmsType", "Invalid sms type: " + value);
+		Log.e(SmsType.class.getSimpleName(), "Invalid sms type: " + value);
 		return UNKNOWN;
 	}
 

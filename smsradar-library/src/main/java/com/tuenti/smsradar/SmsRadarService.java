@@ -26,6 +26,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
+import android.provider.Telephony;
 
 
 /**
@@ -40,9 +41,7 @@ import android.os.IBinder;
  */
 public class SmsRadarService extends Service {
 
-	private static final String CONTENT_SMS_URI = "content://sms";
 	private static final int ONE_SECOND = 1000;
-
 
 	private ContentResolver contentResolver;
 	private SmsObserver smsObserver;
@@ -68,69 +67,40 @@ public class SmsRadarService extends Service {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		finishService();
+        // finish service
+        initialized = false;
+        // unregister content observer
+        contentResolver.unregisterContentObserver(smsObserver);
 	}
 
 	@Override
 	public void onTaskRemoved(Intent rootIntent) {
 		super.onTaskRemoved(rootIntent);
-		restartService();
+        // restart service
+        Intent intent = new Intent(this, SmsRadarService.class);
+        PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, 0);
+        long now = getTimeProvider().getDate().getTime();
+        getAlarmManager().set(AlarmManager.RTC_WAKEUP, now + ONE_SECOND, pendingIntent);
 	}
 
 	private void initializeService() {
 		initialized = true;
-		initializeDependencies();
-		registerSmsContentObserver();
-	}
 
-	private void initializeDependencies() {
-		if (!areDependenciesInitialized()) {
-			initializeContentResolver();
-			initializeSmsObserver();
-		}
-	}
+        // initialize content resolver
+        if(contentResolver == null) {
+            this.contentResolver = getContentResolver();
+        }
 
-	private boolean areDependenciesInitialized() {
-		return contentResolver != null && smsObserver != null;
-	}
+        // initialize SMS observer
+        if(smsObserver == null) {
+            Handler handler = new Handler();
+            SmsStorage smsStorage = new SharedPreferencesSmsStorage(getBaseContext());
+            SmsCursorParser smsCursorParser = new SmsCursorParser(smsStorage);
+            this.smsObserver = new SmsObserver(contentResolver, handler, smsCursorParser);
+        }
 
-	private void initializeSmsObserver() {
-		Handler handler = new Handler();
-		SmsCursorParser smsCursorParser = initializeSmsCursorParser();
-		this.smsObserver = new SmsObserver(contentResolver, handler, smsCursorParser);
-	}
-
-	private SmsCursorParser initializeSmsCursorParser() {
-		SharedPreferences preferences = getSharedPreferences("sms_preferences", MODE_PRIVATE);
-		SmsStorage smsStorage = new SharedPreferencesSmsStorage(preferences);
-		return new SmsCursorParser(smsStorage, getTimeProvider());
-	}
-
-	private void initializeContentResolver() {
-		this.contentResolver = getContentResolver();
-	}
-
-	private void finishService() {
-		initialized = false;
-		unregisterSmsContentObserver();
-	}
-
-
-	private void registerSmsContentObserver() {
-		Uri smsUri = Uri.parse(CONTENT_SMS_URI);
-		boolean notifyForDescendents = true;
-		contentResolver.registerContentObserver(smsUri, notifyForDescendents, smsObserver);
-	}
-
-	private void unregisterSmsContentObserver() {
-		contentResolver.unregisterContentObserver(smsObserver);
-	}
-
-	private void restartService() {
-		Intent intent = new Intent(this, SmsRadarService.class);
-		PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, 0);
-		long now = getTimeProvider().getDate().getTime();
-		getAlarmManager().set(AlarmManager.RTC_WAKEUP, now + ONE_SECOND, pendingIntent);
+        // register content observer
+        contentResolver.registerContentObserver(Telephony.Sms.CONTENT_URI, true, smsObserver);
 	}
 
 	private TimeProvider getTimeProvider() {

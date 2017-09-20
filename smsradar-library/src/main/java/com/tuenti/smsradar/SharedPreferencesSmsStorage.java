@@ -15,9 +15,9 @@
  */
 package com.tuenti.smsradar;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.os.Bundle;
 
 /**
  * SmsStorage implementation based on shared preferences.
@@ -27,22 +27,23 @@ import android.os.Bundle;
  */
 class SharedPreferencesSmsStorage implements SmsStorage {
 
-	private static final String LAST_SMS_PARSED_ID = "last_sms_parsed_id";
-	private static final String LAST_SMS_PARSED_TIME = "last_sms_parsed_time";
-	private static final int DEFAULT_SMS_PARSED_VALUE = -1;
+    private static final String
+            PREFRENCES_ID = "smsradar_preferences",
+	        LAST_SMS_PARSED_ID = "last_sms_parsed_id",
+	        LAST_SMS_PARSED_TIME = "last_sms_parsed_time";
+
+	private static final int
+            DEFAULT_SMS_PARSED_VALUE = -1;
 
 	private SharedPreferences preferences;
 
-	SharedPreferencesSmsStorage(SharedPreferences preferences) {
-		if (preferences == null) {
-			throw new IllegalArgumentException("SharedPreferences param can't be null");
-		}
-		this.preferences = preferences;
+	SharedPreferencesSmsStorage(Context context) {
+		this.preferences = context.getSharedPreferences(PREFRENCES_ID, Context.MODE_PRIVATE);
 	}
 
 	@Override
 	public void updateLastSmsIntercepted(int smsId, String date) {
-		Editor editor = preferences.edit();
+        Editor editor = preferences.edit();
 		editor.putInt(LAST_SMS_PARSED_ID, smsId);
 		editor.putString(LAST_SMS_PARSED_TIME, date);
 		editor.apply();
@@ -50,7 +51,7 @@ class SharedPreferencesSmsStorage implements SmsStorage {
 
 	@Override
 	public Sms getLastSmsIntercepted() {
-		return new Sms(preferences.getInt(LAST_SMS_PARSED_ID, -1), null, preferences.getString(LAST_SMS_PARSED_TIME, null), null, null);
+		return new Sms(preferences.getInt(LAST_SMS_PARSED_ID, DEFAULT_SMS_PARSED_VALUE), null, preferences.getString(LAST_SMS_PARSED_TIME, null), null, null);
 	}
 
 	@Override

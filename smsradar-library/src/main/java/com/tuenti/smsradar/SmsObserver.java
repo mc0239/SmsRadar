@@ -22,6 +22,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
 import android.provider.Telephony;
+import android.util.Log;
 
 
 /**
@@ -42,12 +43,6 @@ import android.provider.Telephony;
  */
 class SmsObserver extends ContentObserver {
 
-	private static final Uri SMS_URI = Uri.parse("content://sms/");
-	//private static final Uri SMS_SENT_URI = Uri.parse("content://sms/sent");
-	//private static final Uri SMS_INBOX_URI = Uri.parse("content://sms/inbox");
-	private static final String PROTOCOL_COLUM_NAME = "protocol";
-	private static final String SMS_ORDER = "date DESC";
-
 	private ContentResolver contentResolver;
 	private SmsCursorParser smsCursorParser;
 
@@ -63,33 +58,24 @@ class SmsObserver extends ContentObserver {
 	}
 
 	@Override
-	public void onChange(boolean selfChange) {
-		super.onChange(selfChange);
+	public void onChange(boolean selfChange, Uri uri) {
+		super.onChange(selfChange, uri);
+
 		Cursor cursor = null;
 		try {
 			cursor = getSmsContentObserverCursor();
 			if (cursor != null && cursor.moveToFirst()) {
-				processSms(cursor);
+                Sms sms = smsCursorParser.parse(cursor);
+                notifySmsListener(sms);
 			}
 		} finally {
-			close(cursor);
-		}
-	}
-
-	private void processSms(Cursor cursor) {
-		Cursor smsCursor = null;
-		try {
-			String protocol = cursor.getString(cursor.getColumnIndex(PROTOCOL_COLUM_NAME));
-			smsCursor = getSmsCursor(protocol);
-			Sms sms = parseSms(smsCursor);
-			notifySmsListener(sms);
-		} finally {
-			close(smsCursor);
+			if(cursor != null) cursor.close();
 		}
 	}
 
 	private void notifySmsListener(Sms sms) {
 		if (sms != null && SmsRadar.smsListener != null) {
+            Log.v(this.getClass().getSimpleName(), "Notify about SMS: " + sms.toString());
 			if (SmsType.SENT == sms.getType()) {
 				SmsRadar.smsListener.onSmsSent(sms);
 			} else {
@@ -98,69 +84,8 @@ class SmsObserver extends ContentObserver {
 		}
 	}
 
-	private Cursor getSmsCursor(String protocol) {
-		return getSmsDetailsCursor(protocol);
-	}
-
-	private Cursor getSmsDetailsCursor(String protocol) {
-		/*Cursor smsCursor;
-		if (isProtocolForOutgoingSms(protocol)) {
-			//SMS Sent
-			smsCursor = getSmsDetailsCursor(SmsContext.SMS_SENT.getUri());
-		} else {
-			//SMSReceived
-			smsCursor = getSmsDetailsCursor(SmsContext.SMS_RECEIVED.getUri());
-		}
-		return smsCursor;
-		*/
-		return getSmsDetailsCursor(SMS_URI);
-	}
-
 	private Cursor getSmsContentObserverCursor() {
-		String[] projection = null;
-		String selection = null;
-		String[] selectionArgs = null;
-		String sortOrder = null;
-		return contentResolver.query(SMS_URI, projection, selection, selectionArgs, sortOrder);
+		return contentResolver.query(Telephony.Sms.CONTENT_URI, null, null, null, Telephony.Sms.DEFAULT_SORT_ORDER);
 	}
 
-	private boolean isProtocolForOutgoingSms(String protocol) {
-		return protocol == null;
-	}
-
-	private Cursor getSmsDetailsCursor(Uri smsUri) {
-
-		return smsUri != null ? this.contentResolver.query(smsUri, null, null, null, SMS_ORDER) : null;
-	}
-
-	private Sms parseSms(Cursor cursor) {
-		return smsCursorParser.parse(cursor);
-	}
-
-	private void close(Cursor cursor) {
-		if (cursor != null) {
-			cursor.close();
-		}
-	}
-
-	/**
-	 * Represents the SMS origin.
-	 */
-	/*
-	private enum SmsContext {
-		SMS_SENT {
-			@Override
-			Uri getUri() {
-				return SMS_SENT_URI;
-			}
-		}, SMS_RECEIVED {
-			@Override
-			Uri getUri() {
-				return SMS_INBOX_URI;
-			}
-		};
-
-		abstract Uri getUri();
-	}
-	*/
 }

@@ -31,10 +31,17 @@ public interface SmsListener {
 	public void onSmsSent(Sms sms);
 
 	/**
-	 * Invoked when an outgoing sms is intercepted.
+	 * Invoked when an outgoing sms is intercepted. <br/>
+     * Note that the message that is sent is not necessarily sent successfully.
 	 *
 	 * @param sms
 	 */
 	public void onSmsReceived(Sms sms);
+
+	/**
+	 * Invoked when an sms has failed to be send.
+	 * @param sms
+	 */
+	public void onSmsFailed(Sms sms);
 
 }

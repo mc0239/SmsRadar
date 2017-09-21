@@ -62,4 +62,7 @@ public enum SmsType {
 		return UNKNOWN;
 	}
 
+    public int getValue() {
+        return value;
+    }
 }

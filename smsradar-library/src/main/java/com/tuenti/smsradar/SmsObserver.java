@@ -83,7 +83,11 @@ class SmsObserver extends ContentObserver {
                 case RECEIVED:
                     SmsRadar.smsListener.onSmsReceived(sms);
                     break;
+                case FAILED:
+                    SmsRadar.smsListener.onSmsFailed(sms);
+                    break;
                 default:
+                	Log.v(this.getClass().getSimpleName(), "Recieved SMS of some other type: " + sms.toString());
                     break;
             }
 		}

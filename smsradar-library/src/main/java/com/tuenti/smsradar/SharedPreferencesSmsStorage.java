@@ -30,10 +30,11 @@ class SharedPreferencesSmsStorage implements SmsStorage {
     private static final String
             PREFRENCES_ID = "smsradar_preferences",
 	        LAST_SMS_PARSED_ID = "last_sms_parsed_id",
-	        LAST_SMS_PARSED_TIME = "last_sms_parsed_time";
+	        LAST_SMS_PARSED_TIME = "last_sms_parsed_time",
+	        LAST_SMS_PARSED_TYPE = "last_sms_parsed_type";
 
 	private static final int
-            DEFAULT_SMS_PARSED_VALUE = -1;
+            DEFAULT_SMS_PARSED_ID = -1;
 
 	private SharedPreferences preferences;
 
@@ -42,23 +43,31 @@ class SharedPreferencesSmsStorage implements SmsStorage {
 	}
 
 	@Override
-	public void updateLastSmsIntercepted(int smsId, String date) {
+	public void updateLastSmsIntercepted(int smsId, String date, int type) {
         Editor editor = preferences.edit();
 		editor.putInt(LAST_SMS_PARSED_ID, smsId);
 		editor.putString(LAST_SMS_PARSED_TIME, date);
+		editor.putInt(LAST_SMS_PARSED_TYPE, type);
 		editor.apply();
 	}
 
 	@Override
 	public Sms getLastSmsIntercepted() {
-		return new Sms(preferences.getInt(LAST_SMS_PARSED_ID, DEFAULT_SMS_PARSED_VALUE), null, preferences.getString(LAST_SMS_PARSED_TIME, null), null, null);
+		return new Sms(
+		        preferences.getInt(LAST_SMS_PARSED_ID, DEFAULT_SMS_PARSED_ID),
+                null,
+                preferences.getString(LAST_SMS_PARSED_TIME, null),
+                null,
+                SmsType.fromValue(preferences.getInt(LAST_SMS_PARSED_TYPE, -1))
+        );
 	}
 
     @Override
     public void clearLastSmsIntercepted() {
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt(LAST_SMS_PARSED_ID, DEFAULT_SMS_PARSED_VALUE);
+        editor.putInt(LAST_SMS_PARSED_ID, DEFAULT_SMS_PARSED_ID);
         editor.putString(LAST_SMS_PARSED_TIME, null);
+        editor.putInt(LAST_SMS_PARSED_TYPE, -1);
         editor.apply();
     }
 }

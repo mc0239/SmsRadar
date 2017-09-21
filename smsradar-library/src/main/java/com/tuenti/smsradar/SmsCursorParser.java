@@ -50,11 +50,11 @@ class SmsCursorParser {
 
 		Sms smsParsed = extractSmsInfoFromCursor(cursor);
 
-        Sms received = new Sms(smsParsed.getSmsId(), null, smsParsed.getDate(), null, null);
+        Sms received = new Sms(smsParsed.getSmsId(), null, smsParsed.getDate(), null, smsParsed.getType());
         Sms stored = smsStorage.getLastSmsIntercepted();
 
         if(!received.equals(stored) && isActuallyNewSms(received, stored)) {
-            smsStorage.updateLastSmsIntercepted(smsParsed.getSmsId(), smsParsed.getDate());
+            smsStorage.updateLastSmsIntercepted(smsParsed.getSmsId(), smsParsed.getDate(), smsParsed.getType().getValue());
         } else {
             smsParsed = null;
         }
@@ -62,13 +62,22 @@ class SmsCursorParser {
         return smsParsed;
 	}
 
-	private boolean isActuallyNewSms(Sms received, Sms stored) {
+	private boolean isActuallyNewSms(@NonNull Sms received, @NonNull Sms stored) {
         int oldId = stored.getSmsId();
         int newId = received.getSmsId();
-        long oldDate = Long.parseLong(stored.getDate());
-        long newDate = Long.parseLong(received.getDate());
+        long oldDate, newDate;
+        try {
+            oldDate = Long.parseLong(stored.getDate());
+        } catch (NumberFormatException e) {
+            oldDate = 0;
+        }
+        try {
+            newDate = Long.parseLong(received.getDate());
+        } catch (NumberFormatException e) {
+            newDate = oldDate;
+        }
 
-        return newId > oldId || newDate > oldDate;
+        return newId > oldId || newDate > oldDate || received.getType() != stored.getType();
     }
 
 	private Sms extractSmsInfoFromCursor(Cursor cursor) {

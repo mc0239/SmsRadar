@@ -73,6 +73,11 @@ public class MainActivity extends Activity {
 			public void onSmsReceived(Sms sms) {
 				showSmsToast(sms);
 			}
+
+			@Override
+			public void onSmsFailed(Sms sms) {
+				// TODO
+			}
 		});
 	}
 

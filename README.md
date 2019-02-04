@@ -1,6 +1,4 @@
-### Note
-
-This reporsitory is a fork of [vaslabs/SmsRadar](https://github.com/vaslabs/SmsRadar).
+**For a very basic sample on how to listen for text messages, see [this gist](https://gist.github.com/mc0239/b016667f4fa5bc5228214ea0514ec2a6).**
 
 # SMS Radar [![Build Status](https://travis-ci.org/tuenti/SmsRadar.svg?branch=master)](https://travis-ci.org/tuenti/SmsRadar) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.tuenti.smsradar/library/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.tuenti.smsradar/library) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-SmsRadar-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/1328)
 
